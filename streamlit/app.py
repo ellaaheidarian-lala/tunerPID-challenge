@@ -1,9 +1,3 @@
-"""
-Streamlit Manual Controller Tuner
-=================================
-Backend developers use this to test new core features before they are exposed
-via the REST API. It imports the SAME engine (src.core) that FastAPI uses.
-"""
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -176,4 +170,4 @@ if uploaded_file is not None:
                 st.metric("Control Effort", f"{m['control_effort']:.2f}")
                 st.metric("RMSE", f"{m['rmse']:.4f}")
 else:
-    st.info("👆 Upload a `.py` dynamics file to begin tuning.")
+    st.info("Upload a .py dynamics file to begin tuning.")

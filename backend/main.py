@@ -1,4 +1,3 @@
-"""Thin HTTP adapter for the supplied simulation engine."""
 import ast
 from contextlib import asynccontextmanager
 from copy import copy
