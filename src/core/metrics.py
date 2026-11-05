@@ -2,8 +2,7 @@ import numpy as np
 from typing import Any
 class MetricsCalculator:
     """
-    Calculates control-theory performance metrics from a single simulation run.
-    All methods are static: pass in the raw arrays, get back numbers.
+    Calculate performance metrics from error and control histories.
     """
     @staticmethod
     def calculate(

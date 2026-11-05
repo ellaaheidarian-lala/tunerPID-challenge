@@ -12,8 +12,7 @@ class Simulator:
         fixed_initial_state: Optional[list[float]] = None,
     ) -> dict:
         """
-        Run one simulation and compute metrics.
-        Returns a dict ready for SimulationResponse Pydantic model.
+        Return the trajectory, control inputs, and metrics for one simulation.
         """
         ic = np.array(fixed_initial_state) if fixed_initial_state else None
         if controller_type == "FSF":

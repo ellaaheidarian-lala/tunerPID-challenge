@@ -1,6 +1,6 @@
 # Controller Tuner Platform
 
-FastAPI + React/Tailwind application using the supplied `src/core` engine directly. The engine and case studies are unchanged. The Streamlit reference has only text changes.
+Controller tuning app built with FastAPI, React, and Tailwind. Simulations use `src/core` directly. Engine calculations and case studies are unchanged; comments and introductory text have been shortened.
 
 ## Run with Docker
 

@@ -60,7 +60,7 @@ def get_system(system_id):
 
 
 def check_source(source: bytes):
-    """Basic screening only: uploaded Python is trusted code, not sandboxed."""
+    """Screen common unsafe constructs; this does not sandbox Python."""
     try:
         tree = ast.parse(source)
     except (SyntaxError, ValueError, UnicodeError) as exc:
@@ -132,9 +132,9 @@ def simulate(system_id: str, request: SimulationRequest):
             raise ValueError('Dynamics stopped before completing the simulation.')
         if any(not math.isfinite(v) for key in ['trajectory', 'control_signals'] for v in result[key]):
             raise ValueError('Simulation diverged. Try different gains or a smaller time step.')
-        # The engine may produce one extra time value due to floating-point arange.
+        # Avoid an extra timestamp from floating-point rounding in arange.
         result['time_points'] = [i * system.dt for i in range(expected)]
-        # Unreached settling/rise times are infinity in the engine; JSON uses null.
+        # Encode infinite metrics as JSON null.
         result['metrics'] = {k: (v if not isinstance(v, float) or math.isfinite(v) else None) for k, v in result['metrics'].items()}
         result['target'] = system.target
         return result

@@ -3,10 +3,7 @@ import importlib.util
 from typing import Optional, List
 class DynamicalSystem:
     """
-    Wraps a user-uploaded Python file that MUST expose:
-        def dynamics(t: float, x: np.ndarray, u: float | np.ndarray) -> np.ndarray
-    Auto-detects state dimension by probing the function.
-    Supports both PID (output feedback) and FSF (full-state feedback) simulations.
+    Load dynamics(t, x, u) and run PID or full-state feedback simulations.
     """
     def __init__(self, file_path: str, num_inputs: int = 1):
         self.file_path = file_path
@@ -36,7 +33,7 @@ class DynamicalSystem:
             raise RuntimeError("Uploaded file must define a top-level `dynamics(t, x, u)` function")
         self._dynamics = module.dynamics
     def _detect_dimension(self) -> None:
-        """Probe dynamics(t, x, u) to discover state vector size (1 … 10)."""
+        """Detect between 1 and 10 states by probing dynamics."""
         for n in range(1, 11):
             try:
                 x = np.zeros(n)
@@ -53,8 +50,7 @@ class DynamicalSystem:
         )
     def get_param_schema(self, controller_type: str) -> dict[str, dict[str, float]]:
         """
-        Returns { param_name: { "min": float, "max": float } }.
-        The frontend turns each entry into a slider.
+        Return the minimum and maximum for each controller gain.
         """
         if controller_type == "FSF":
             return {f"K{i + 1}": {"min": 0.01, "max": 100.0} for i in range(self.num_states)}
@@ -74,8 +70,7 @@ class DynamicalSystem:
         initial_state: Optional[np.ndarray] = None,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
-        PID on the output_channel.
-        Returns: (output_history, control_history, error_history)
+        Return output, control, and error histories for PID feedback.
         """
         n_steps = int(self.max_time / self.dt) + 1
         t_vec = np.arange(0, self.max_time + self.dt, self.dt)[:n_steps]
@@ -120,8 +115,7 @@ class DynamicalSystem:
         initial_state: Optional[np.ndarray] = None,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
-        Full-state feedback: u = -K · (x - x_desired).
-        Returns: (output_history, control_history, error_history)
+        Return output, control, and error histories for u = -K @ (x - x_desired).
         """
         K = np.array(K_values)
         n_steps = int(self.max_time / self.dt) + 1
