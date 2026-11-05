@@ -51,7 +51,7 @@ class ApiTests(unittest.TestCase):
         system_id = self.upload()
         endpoint = f'/api/v1/systems/{system_id}/simulate'
         valid = {'controller_type': 'PID', 'params': {'Kp': 1, 'Ki': .1, 'Kd': .5}}
-        for patch in [{'controller_type': 'INVALID'}, {'params': {'Kp': 1}}, {'params': {'Kp': 100, 'Ki': .1, 'Kd': .5}}, {'fixed_initial_state': [1]}, {'system_config': {'dt': 0}}, {'system_config': {'min_control': 10, 'max_control': -10}}]:
+        for patch in [{'controller_type': 'INVALID'}, {'params': {'Kp': 1}}, {'params': {'Kp': 100, 'Ki': .1, 'Kd': .5}}, {'fixed_initial_state': [1]}, {'system_config': {'dt': 0}}, {'system_config': {'min_control': 10, 'max_control': -10}}, {'system_config': {'dt': .001, 'max_time': 30}}]:
             self.assertEqual(self.client.post(endpoint, json={**valid, **patch}).status_code, 422)
         self.assertEqual(self.client.post(endpoint, json=valid).status_code, 200)
 

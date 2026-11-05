@@ -107,6 +107,23 @@ export default function App() {
         )
       )
         throw new Error("Fill in all simulation settings with finite numbers.");
+      const limits = {
+        dt: [0.001, 0.1],
+        max_time: [0.1, 30],
+        target: [-100, 100],
+        min_control: [-100, 100],
+        max_control: [-100, 100],
+      };
+      for (const [key, [minimum, maximum]] of Object.entries(limits)) {
+        if (config[key] < minimum || config[key] > maximum)
+          throw new Error(
+            key + " must be between " + minimum + " and " + maximum + ".",
+          );
+      }
+      if (Math.floor(config.max_time / config.dt) + 1 > 30000)
+        throw new Error(
+          "Choose a shorter duration or a larger time step (maximum 30,000 points).",
+        );
       if (config.min_control >= config.max_control)
         throw new Error("Minimum control must be less than maximum control.");
       let state = null;

@@ -14,8 +14,8 @@ class SystemConfig(BaseModel):
     def check_limits(self):
         if self.min_control >= self.max_control:
             raise ValueError('min_control must be less than max_control')
-        if self.max_time / self.dt > 30000:
-            raise ValueError('At most 30000 simulation steps are allowed')
+        if int(self.max_time / self.dt) + 1 > 30000:
+            raise ValueError('At most 30000 simulation points are allowed')
         return self
 
 
