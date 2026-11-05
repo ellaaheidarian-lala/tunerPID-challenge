@@ -7,3 +7,4 @@ body {
   color: #f3f4f6;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
+.field { width: 100%; border: 1px solid #374151; border-radius: .5rem; padding: .6rem; background: #030712; color: #f3f4f6; }

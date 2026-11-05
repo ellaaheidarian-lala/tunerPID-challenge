@@ -1,16 +1,19 @@
-version: '3.8'
-
 services:
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
-    restart: always
-
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
   frontend:
     build: ./frontend
     ports:
       - "3000:80"
     depends_on:
-      - backend
-    restart: always
+      backend:
+        condition: service_healthy
