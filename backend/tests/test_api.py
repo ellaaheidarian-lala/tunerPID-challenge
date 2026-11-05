@@ -77,3 +77,60 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         response = self.client.post('/api/v1/systems/' + response.json()['system_id'] + '/simulate', json={'controller_type': 'P', 'params': {'Kp': 1}})
         self.assertEqual(response.status_code, 422)
+
+    def test_delete_system(self):
+        system_id = self.upload()
+        endpoint = f'/api/v1/systems/{system_id}'
+        self.assertEqual(self.client.delete(endpoint).status_code, 204)
+        self.assertEqual(self.client.get(endpoint + '/schema').status_code, 404)
+        self.assertEqual(self.client.delete(endpoint).status_code, 404)
+
+    def test_timeout_releases_worker(self):
+        from backend.runner import execute
+        from fastapi import HTTPException
+        with self.assertRaises(HTTPException) as error:
+            execute(b'while True: pass', timeout=0.3)
+        self.assertEqual(error.exception.status_code, 408)
+        self.upload()
+
+    def test_nonfinite_trajectory_is_rejected(self):
+        source = b'import numpy as np\ndef dynamics(t,x,u):\n return np.array([float("nan"),0.0])\n'
+        response = self.client.post('/api/v1/upload', files={'file': ('nan.py', source)})
+        self.assertEqual(response.status_code, 201)
+        endpoint = '/api/v1/systems/' + response.json()['system_id'] + '/simulate'
+        self.assertEqual(self.client.post(endpoint, json={'params': {'Kp': 1, 'Ki': .1, 'Kd': .5}}).status_code, 422)
+
+    def test_busy_workers_return_retry_after(self):
+        from backend.runner import _slots
+        system_id = self.upload()
+        _slots.acquire()
+        _slots.acquire()
+        try:
+            response = self.client.post(f'/api/v1/systems/{system_id}/simulate', json={'controller_type': 'P', 'params': {'Kp': 1}})
+            self.assertEqual(response.status_code, 503)
+            self.assertEqual(response.headers['retry-after'], '2')
+        finally:
+            _slots.release()
+            _slots.release()
+
+
+class StoreTests(unittest.TestCase):
+    def test_capacity_expiration_and_deletion(self):
+        from unittest.mock import patch
+        from fastapi import HTTPException
+        from backend.store import SystemStore
+        store = SystemStore(capacity=1, ttl=10)
+        with patch('backend.store.monotonic', return_value=100):
+            key = store.add(b'source', 'example', 2, {})
+            self.assertEqual(store.get(key).name, 'example')
+            with self.assertRaises(HTTPException) as error:
+                store.add(b'other', 'example', 2, {})
+            self.assertEqual(error.exception.status_code, 503)
+        with patch('backend.store.monotonic', return_value=111):
+            with self.assertRaises(HTTPException) as error:
+                store.get(key)
+            self.assertEqual(error.exception.status_code, 404)
+            next_key = store.add(b'new', 'example', 2, {})
+            store.delete(next_key)
+            with self.assertRaises(HTTPException):
+                store.get(next_key)

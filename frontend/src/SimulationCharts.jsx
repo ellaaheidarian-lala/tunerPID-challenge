@@ -1,5 +1,14 @@
-import React from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Legend } from 'recharts';
+import React from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 export default function SimulationCharts({ data }) {
   if (!data || !data.time_points) return null;
   const chartData = data.time_points.map((t, index) => ({
@@ -18,13 +27,49 @@ export default function SimulationCharts({ data }) {
         <div className="h-[250px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.5} />
-              <XAxis type="number" domain={['dataMin', 'dataMax']} unit=" s" dataKey="time" stroke="#9ca3af" fontSize={12} tickLine={false} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#374151"
+                opacity={0.5}
+              />
+              <XAxis
+                type="number"
+                domain={["dataMin", "dataMax"]}
+                unit=" s"
+                dataKey="time"
+                stroke="#9ca3af"
+                fontSize={12}
+                tickLine={false}
+              />
               <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} />
-              <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', borderRadius: '0.5rem', color: '#fff' }} />
-              <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
-              <Line type="linear" isAnimationActive={false} dataKey="output" stroke="#3b82f6" name="System Output" dot={false} strokeWidth={2} />
-              <Line type="linear" isAnimationActive={false} dataKey="target" stroke="#ef4444" name="Desired Target" strokeDasharray="4 4" dot={false} strokeWidth={2} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#1f2937",
+                  borderColor: "#374151",
+                  borderRadius: "0.5rem",
+                  color: "#fff",
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "8px" }} />
+              <Line
+                type="linear"
+                isAnimationActive={false}
+                dataKey="output"
+                stroke="#3b82f6"
+                name="System Output"
+                dot={false}
+                strokeWidth={2}
+              />
+              <Line
+                type="linear"
+                isAnimationActive={false}
+                dataKey="target"
+                stroke="#ef4444"
+                name="Desired Target"
+                strokeDasharray="4 4"
+                dot={false}
+                strokeWidth={2}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -37,12 +82,39 @@ export default function SimulationCharts({ data }) {
         <div className="h-[220px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.5} />
-              <XAxis type="number" domain={['dataMin', 'dataMax']} unit=" s" dataKey="time" stroke="#9ca3af" fontSize={12} tickLine={false} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#374151"
+                opacity={0.5}
+              />
+              <XAxis
+                type="number"
+                domain={["dataMin", "dataMax"]}
+                unit=" s"
+                dataKey="time"
+                stroke="#9ca3af"
+                fontSize={12}
+                tickLine={false}
+              />
               <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} />
-              <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', borderRadius: '0.5rem', color: '#fff' }} />
-              <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
-              <Line type="linear" isAnimationActive={false} dataKey="control" stroke="#10b981" name="Control Input (u)" dot={false} strokeWidth={2} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#1f2937",
+                  borderColor: "#374151",
+                  borderRadius: "0.5rem",
+                  color: "#fff",
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "8px" }} />
+              <Line
+                type="linear"
+                isAnimationActive={false}
+                dataKey="control"
+                stroke="#10b981"
+                name="Control Input (u)"
+                dot={false}
+                strokeWidth={2}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
