@@ -14,6 +14,7 @@ async function api(path, options) {
 
 export default function App() {
   const [system, setSystem] = useState(null);
+  const [selectedFileName, setSelectedFileName] = useState('');
   const [controller, setController] = useState('PID');
   const [schema, setSchema] = useState({});
   const [gains, setGains] = useState({});
@@ -26,6 +27,7 @@ export default function App() {
 
   async function upload(file) {
     if (!file) return;
+    setSelectedFileName(file.name);
     setError(''); setResult(null); setSystem(null); setSchema({}); setGains({});
     if (!file.name.toLowerCase().endsWith('.py')) { setError('Choose a .py dynamics file.'); return; }
     setBusy('Uploading…');
@@ -71,7 +73,7 @@ export default function App() {
     <div className="grid lg:grid-cols-3 gap-6">
       <form onSubmit={run} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-5">
         <fieldset disabled={Boolean(busy)} className="space-y-5 disabled:opacity-60">
-          <div><label htmlFor="dynamics" className="block mb-2 font-semibold">1. Upload dynamics (.py)</label><input id="dynamics" type="file" accept=".py" onChange={e => { upload(e.target.files[0]); e.target.value = ''; }} className="w-full text-sm" /></div>
+          <div><label htmlFor="dynamics" className="block mb-2 font-semibold">1. Upload dynamics (.py)</label><div className="flex items-center gap-3 min-w-0"><label htmlFor="dynamics" className="cursor-pointer rounded-lg bg-gray-700 px-3 py-2 text-sm shrink-0 focus-within:ring-2 focus-within:ring-blue-400">Choose file<input id="dynamics" type="file" accept=".py" aria-describedby="selected-file-name" onClick={e => { e.currentTarget.value = ''; }} onChange={e => upload(e.target.files[0])} className="sr-only" /></label><span id="selected-file-name" className="text-sm text-gray-300 break-all">{selectedFileName || 'No file chosen'}</span></div></div>
           {system && <p role="status" className="text-emerald-400">{system.name} · {system.num_states} states</p>}
           <div><label htmlFor="controller" className="block mb-2 font-semibold">2. Controller</label><select id="controller" value={controller} onChange={e => changeController(e.target.value)} className="field">{['P', 'PI', 'PD', 'PID', 'FSF'].map(c => <option key={c}>{c}</option>)}</select></div>
           {Object.entries(schema).map(([key, range]) => <div key={key}><label htmlFor={key} className="flex justify-between mb-2"><span>{key}</span><span className="font-mono text-blue-300">{gains[key]?.toFixed(2)}</span></label><input id={key} type="range" min={range.min} max={range.max} step="0.01" value={gains[key] ?? range.min} onChange={e => { setGains({ ...gains, [key]: Number(e.target.value) }); setResult(null); }} className="w-full accent-blue-500" /><div className="flex justify-between text-xs text-gray-500"><span>{range.min}</span><span>{range.max}</span></div></div>)}
